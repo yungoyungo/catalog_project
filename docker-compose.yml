@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  mysql:
+    build:
+      context: .
+      dockerfile: ./docker/mysql/Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_DATABASE: 'catalog_dev'
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql/tmp/mysql:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+  php:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    environment:
+      DB_HOST: mysql
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/usr/src/catalog
+      - /usr/src/catalog/node_modules
+      - /usr/src/catalog/vendor
+    depends_on:
+      - mysql
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    volumes:
+      - ./public:/usr/src/catalog/public
+    ports:
+      - "80:80"
+    depends_on:
+      - php
