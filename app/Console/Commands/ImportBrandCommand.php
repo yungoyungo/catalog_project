@@ -42,6 +42,48 @@ class ImportBrandCommand extends Command
      */
     public function handle()
     {
-        echo("hello, php\n");
+        $results = $this->requestCarsensor();
+        foreach($results['brand'] as $result){
+            $country = Country::firstOrCreate(
+                [
+                    'name' => $result['country']['name'],
+                ], [
+                    'code' => $result['country']['code'],
+                    'area' => 'world',
+                ]
+            );
+            $brand = CarBrand::firstOrCreate(
+                [
+                    'name' => $result['name'],
+                ], [
+                    'country_id' => $country['id'],
+                    'code' => $result['code'],
+                ]
+            );
+        }
+    }
+
+    /**
+     * カタログ情報のリクエスト
+     *
+     * @param \App\CarBrand $brand
+     * @param int $start
+     *
+     * @return objects
+     */
+    private function requestCarsensor($start = 1)
+    {
+        $client = new Client([
+            'base_uri' => 'http://webservice.recruit.co.jp',
+        ]);
+        $apiKey = env('CARSENSOR_API_KEY');
+
+        $response = $client->request(
+            'GET',
+            "/carsensor/brand/v1/?key={$apiKey}&format=json"
+        );
+        $results = json_decode($response->getBody(), true)['results'];
+
+        return $results;
     }
 }
