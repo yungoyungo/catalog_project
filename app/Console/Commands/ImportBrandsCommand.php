@@ -6,8 +6,6 @@ use Illuminate\Console\Command;
 use GuzzleHttp\Client;
 use App\Country;
 use App\CarBrand;
-use App\CarModel;
-use App\CarGrade;
 
 class ImportBrandCommand extends Command
 {
