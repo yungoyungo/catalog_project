@@ -14,7 +14,7 @@ class ImportBrandCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'command:ImportBrands';
+    protected $signature = 'import:brands';
 
     /**
      * The console command description.
@@ -40,7 +40,7 @@ class ImportBrandCommand extends Command
      */
     public function handle()
     {
-        $results = $this->requestCarsensor();
+        $results = $this->requestBrands();
         foreach($results['brand'] as $result){
             $country = Country::firstOrCreate(
                 [
@@ -64,12 +64,9 @@ class ImportBrandCommand extends Command
     /**
      * カタログ情報のリクエスト
      *
-     * @param \App\CarBrand $brand
-     * @param int $start
-     *
      * @return objects
      */
-    private function requestCarsensor($start = 1)
+    private function requestBrands()
     {
         $client = new Client([
             'base_uri' => 'http://webservice.recruit.co.jp',
