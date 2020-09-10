@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 use App\Country;
 use App\CarBrand;
 
-class ImportBrandCommand extends Command
+class ImportBrandsCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -62,7 +62,7 @@ class ImportBrandCommand extends Command
     }
 
     /**
-     * カタログ情報のリクエスト
+     * ブランド情報のリクエスト
      *
      * @return objects
      */
