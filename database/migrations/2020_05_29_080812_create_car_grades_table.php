@@ -18,10 +18,10 @@ class CreateCarGradesTable extends Migration
             $table->unsignedBigInteger('car_model_id');
             $table->string('code')->nullable();
             $table->string('name')->nullable();
-            $table->tinyInteger('capacity')->nullable();
-            $table->tinyInteger('length')->nullable();
-            $table->tinyInteger('width')->nullable();
-            $table->tinyInteger('height')->nullable();
+            $table->unsignedTinyInteger('capacity')->nullable();
+            $table->unsignedSmallInteger('length')->nullable();
+            $table->unsignedSmallInteger('width')->nullable();
+            $table->unsignedSmallInteger('height')->nullable();
             $table->unsignedInteger('price')->nullable();
             $table->date('start_at')->nullable();
             $table->date('end_at')->nullable();
