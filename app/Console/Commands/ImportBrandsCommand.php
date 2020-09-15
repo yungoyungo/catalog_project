@@ -50,7 +50,10 @@ class ImportBrandsCommand extends Command
                     'area' => 'world',
                 ]
             );
-            $brand = CarBrand::firstOrCreate(
+            if($country->wasRecentlyCreated){
+                echo("insert into countries : ".$country->name."\n");
+            }
+            $carBrand = CarBrand::firstOrCreate(
                 [
                     'name' => $result['name'],
                 ], [
@@ -58,7 +61,11 @@ class ImportBrandsCommand extends Command
                     'code' => $result['code'],
                 ]
             );
+            if($carBrand->wasRecentlyCreated){
+                echo("insert into car_brands : ".$carBrand->name."\n");
+            }
         }
+        echo("brand import complete!\n");
     }
 
     /**
