@@ -18,7 +18,9 @@ class ImportModelsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'import:models';
+    protected $signature = 'import:models
+    {--b|--brandCode= : 開始ブランドをコードで指定}
+    {--s|--start=1 : 開始ポイントを指定}';
 
     /**
      * The console command description.
@@ -45,7 +47,18 @@ class ImportModelsCommand extends Command
     public function handle()
     {
         $carBrands = CarBrand::all();
+
+        // 引数にブランドとミッションと開始点があった場合そこまでスキップ
+        $hasBrandSkipped = false;
+        $hasNumberSkipped = false;
+
         foreach($carBrands as $carBrand){
+            if (!$hasBrandSkipped && $this->option('brandCode') !== null && $carBrand->code !== $this->option('brandCode')) {
+                echo("skip: {$carBrand->name}\n");
+                continue;
+            }
+            $hasBrandSkipped = true;
+
             $start = 1;
             $results = $this->requestModels($carBrand, $start);
             $available = $results['results_available'];
@@ -53,22 +66,22 @@ class ImportModelsCommand extends Command
 
             while ($start < $available) {
                 if (($start+100) < $available) {
-                    $end = $start + 100;
+                    $end = $start + 99;
                 } else {
                     $end = $available;
                 }
-                echo("\r".$start."-".$end);
+                echo("\n".$start."-".$end." :requesting...\n");
                 $results = $this->requestModels($carBrand, $start);
 
                 foreach($results['catalog'] as $result){
                     $carModel = $this->firstOrCreateCarModel($result, $carBrand);
                     if($carModel->wasRecentlyCreated){
-                        echo("insert into car_models : ".$carModel->name."\n");
+                        echo("new model : ".$carModel->name."\n");
                     }
 
                     $carGrade = $this->firstOrCreateCarGrades($result, $carModel);
                     if($carGrade->wasRecentlyCreated){
-                        echo("insert into car_grades : ".$carModel->name." / ".$carGrade->name."\n");
+                        echo("new grade : ".$carModel->name." / ".$carGrade->name."\n");
                     }
                 }
                 sleep(self::INT_TIME);
@@ -144,8 +157,8 @@ class ImportModelsCommand extends Command
             $end_at = null;
         }
 
-        // 画像カラムが存在しない場合の暫定的なエラー処理
-        // TODO: よくする
+        // NOTE: 画像カラムが存在しない場合の暫定的なエラー処理
+        // HACK: よくする
         if(!isset($result['photo']['front'])){
             $photo_front_url = null;
             $photo_front_caption = null;
@@ -168,6 +181,7 @@ class ImportModelsCommand extends Command
             $photo_dashboard_caption = $result['photo']['inpane']['caption'];
         }
 
+        // OPTIMIZE: めちゃくちゃ比較してるのでデータ増える程遅くなります
         $carGrade = CarGrade::firstOrCreate([
             'car_model_id'  => $carModel['id'],
             'code' => $result['series'],
