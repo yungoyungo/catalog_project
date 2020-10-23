@@ -195,9 +195,9 @@ class ImportModelsCommand extends Command
             'end_at' => $end_at,
             'body_type' => $result['body']['name'],
             'description' => $result['desc'],
-        ], [
             'photo_front_url' => $photo_front_url,
             'photo_front_caption' => $photo_front_caption,
+        ], [
             'photo_rear_url' => $photo_rear_url,
             'photo_rear_caption' => $photo_rear_caption,
             'photo_dashboard_url' => $photo_dashboard_url,
